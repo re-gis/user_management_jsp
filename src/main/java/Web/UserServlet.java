@@ -32,23 +32,23 @@ public class UserServlet extends HttpServlet {
         try {
             switch (action) {
                 case "/new":
-                    // showNewForm(rq, rs);
+                    showNewForm(rq, rs);
                     break;
 
                 case "/insert":
-                    // insertUser(rq, rs);
+                    insertUser(rq, rs);
                     break;
 
                 case "/delete":
-                    // deleteUser(rq, rs);
+                    deleteUser(rq, rs);
                     break;
 
                 case "/edit":
-                    // showEditForm(rq, rs);
+                    showEditForm(rq, rs);
                     break;
 
                 case "/update":
-                    // updateUser(rq, rs);
+                    updateUser(rq, rs);
                     break;
 
                 default:
@@ -67,5 +67,48 @@ public class UserServlet extends HttpServlet {
         rq.setAttribute("users", users);
         RequestDispatcher dispatcher = rq.getRequestDispatcher("user-form.jsp");
         dispatcher.forward(rq, rs);
+    }
+
+    public void updateUser(HttpServletRequest rq, HttpServletResponse rs)
+            throws SQLException, IOException, ServletException {
+        int id = Integer.parseInt(rq.getParameter("id"));
+        String name = rq.getParameter("name");
+        String email = rq.getParameter("email");
+        String country = rq.getParameter("country");
+
+        User book = new User(id, name, email, country);
+        userDAO.updateUser(book);
+        rs.sendRedirect("list");
+    }
+
+    public void deleteUser(HttpServletRequest rq, HttpServletResponse rs)
+            throws ServletException, IOException, SQLException {
+        int id = Integer.parseInt(rq.getParameter("id"));
+        userDAO.deleteUser(id);
+    }
+
+    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        User existingUser = userDAO.selectUser(id);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("user-form.jsp");
+        request.setAttribute("user", existingUser);
+        dispatcher.forward(request, response);
+    }
+
+    private void insertUser(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        String name = request.getParameter("name");
+        String email = request.getParameter("email");
+        String country = request.getParameter("country");
+        User newUser = new User(name, email, country);
+        userDAO.insertUser(newUser);
+        response.sendRedirect("list");
+    }
+
+    private void showNewForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher("user-form.jsp");
+        dispatcher.forward(request, response);
     }
 }
