@@ -15,12 +15,12 @@ public class UserDAO {
     private String jdbcUsername = "root";
     private String jdbcPassword = "";
 
-    private static final String INSERT_USER_QUERY = "INSERT INTO users " + "(name, email, country) VALUES "
-            + " (?, ?, ?);";
-    private static final String SELECT_USER_BY_ID_QUERY = "SELECT id, name, email, country FROM users WHERE id = ?;";
+    private static final String INSERT_USER_QUERY = "INSERT INTO users " + "(name, age, school, code) VALUES "
+            + " (?, ?, ?, ?);";
+    private static final String SELECT_USER_BY_ID_QUERY = "SELECT id, name, age, school, code FROM users WHERE id = ?;";
     private static final String SELECT_ALL_USERS_QUERY = "SELECT * FROM users;";
     private static final String DELETE_USER = "DELETE FROM users WHERE id = ?;";
-    private static final String UPDATE_USER_QUERY = "update users set name = ?,email= ?, country =? where id = ?;";
+    private static final String UPDATE_USER_QUERY = "update users set name = ?,age= ?, school =?, code = ? where id = ?;";
 
     public UserDAO() {
     }
@@ -44,8 +44,9 @@ public class UserDAO {
                 Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(INSERT_USER_QUERY)) {
             stmt.setString(1, user.getName());
-            stmt.setString(2, user.getEmail());
-            stmt.setString(3, user.getCountry());
+            stmt.setInt(2, user.getAge());
+            stmt.setString(3, user.getSchool());
+            stmt.setString(4, user.getCode());
             stmt.executeUpdate();
         } catch (SQLException e) {
             printSQLException(e);
@@ -63,9 +64,10 @@ public class UserDAO {
 
             while (rs.next()) {
                 String name = rs.getString("name");
-                String email = rs.getString("email");
-                String country = rs.getString("country");
-                user = new User(id, name, email, country);
+                String school = rs.getString("school");
+                String code = rs.getString("code");
+                int age = rs.getInt("age");
+                user = new User(name, age, school, code);
             }
 
         } catch (SQLException e) {
@@ -85,9 +87,10 @@ public class UserDAO {
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
-                String email = rs.getString("email");
-                String country = rs.getString("country");
-                users.add(new User(id, name, email, country));
+                int age = rs.getInt("age");
+                String school = rs.getString("school");
+                String code = rs.getString("code");
+                users.add(new User(id, name, age, school, code));
             }
         } catch (SQLException e) {
             printSQLException(e);
@@ -100,9 +103,10 @@ public class UserDAO {
         try (Connection connection = getConnection();
                 PreparedStatement statement = connection.prepareStatement(UPDATE_USER_QUERY);) {
             statement.setString(1, user.getName());
-            statement.setString(2, user.getEmail());
-            statement.setString(3, user.getCountry());
-            statement.setInt(4, user.getId());
+            statement.setInt(2, user.getAge());
+            statement.setString(3, user.getSchool());
+            statement.setString(4, user.getCode());
+            statement.setInt(5, user.getId());
 
             rowUpdated = statement.executeUpdate() > 0;
         }
